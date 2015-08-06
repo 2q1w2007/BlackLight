@@ -21,6 +21,7 @@ package info.papdt.blacklight.ui.statuses;
 
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -89,5 +90,20 @@ public class RepostActivity extends NewPostActivity
 		}
 		
 		return PostApi.newRepost(mMsg.id, mText.getText().toString(), extra, mVersion);
+	}
+
+	@Override
+	public void send() {
+		if (TextUtils.isEmpty(mText.getText())) {
+			mText.setText(R.string.repost);
+		}
+		
+		super.send();
+	}
+
+	@Override
+	protected boolean needCache() {
+		//转发微博不需要记忆为草稿
+		return false;
 	}
 }

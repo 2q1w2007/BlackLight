@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Peter Cai
  *
  * This file is part of BlackLight
@@ -62,13 +62,8 @@ public class FeedbackActivity extends AbsActivity {
 			new SubmitFeedback().execute(mTitle.getText().toString(), mContent.getText().toString());
 			return true;
 		} else {
-			return false;
+			return super.onOptionsItemSelected(item);
 		}
-	}
-
-	@Override
-	protected View getSwipeView() {
-		return findViewById(R.id.fb_wrapper);
 	}
 
 	private class SubmitFeedback extends AsyncTask<String, Void, Void> {

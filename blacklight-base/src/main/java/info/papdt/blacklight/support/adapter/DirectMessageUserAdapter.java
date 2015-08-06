@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Peter Cai
  *
  * This file is part of BlackLight
@@ -29,6 +29,10 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import android.support.v7.widget.RecyclerView;
+
+import com.squareup.picasso.Picasso;
+
 import info.papdt.blacklight.R;
 import info.papdt.blacklight.cache.user.UserApiCache;
 import info.papdt.blacklight.model.DirectMessageUserListModel;
@@ -36,6 +40,7 @@ import info.papdt.blacklight.model.DirectMessageUserModel;
 import info.papdt.blacklight.support.AsyncTask;
 import info.papdt.blacklight.support.StatusTimeUtils;
 import info.papdt.blacklight.support.Utility;
+import info.papdt.blacklight.support.Binded;
 import info.papdt.blacklight.ui.directmessage.DirectMessageConversationActivity;
 import info.papdt.blacklight.ui.statuses.UserTimeLineActivity;
 
@@ -46,15 +51,16 @@ public class DirectMessageUserAdapter extends HeaderViewAdapter<DirectMessageUse
 	private LayoutInflater mInflater;
 	private UserApiCache mUserApi;
 	private Context mContext;
-	
-	public DirectMessageUserAdapter(Context context, DirectMessageUserListModel list) {
+
+	public DirectMessageUserAdapter(Context context, DirectMessageUserListModel list, RecyclerView recycler) {
+		super(recycler);
 		mList = list;
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mUserApi = new UserApiCache(context);
 		mContext = context;
 		notifyDataSetChangedAndClone();
 	}
-	
+
 	@Override
 	public int getCount() {
 		return mClone.getSize();
@@ -99,7 +105,11 @@ public class DirectMessageUserAdapter extends HeaderViewAdapter<DirectMessageUse
 		text.setText(user.direct_message.text);
 		h.avatar.setImageBitmap(null);
 
-		new AvatarDownloader().execute(h.v, user);
+		Picasso.with(mContext)
+			.load(h.user.user.profile_image_url)
+			.fit()
+			.centerCrop()
+			.into(h.avatar);
 
 		TextView date = h.date;
 
@@ -110,37 +120,7 @@ public class DirectMessageUserAdapter extends HeaderViewAdapter<DirectMessageUse
 		mClone = mList.clone();
 		super.notifyDataSetChanged();
 	}
-	
-	private class AvatarDownloader extends AsyncTask<Object, Void, Object[]> {
-		@Override
-		protected Object[] doInBackground(Object... params) {
-			if (params[0] != null) {
-				DirectMessageUserModel u = (DirectMessageUserModel) params[1];
-				
-				Bitmap img = mUserApi.getSmallAvatar(u.user);
-				
-				return new Object[] {params[0], img, params[1]};
-			}
-			
-			return null;
-		}
 
-		@Override
-		protected void onPostExecute(Object[] result) {
-			super.onPostExecute(result);
-			
-			if (result != null) {
-				View v = (View) result[0];
-				Bitmap img = (Bitmap) result[1];
-				DirectMessageUserModel usr = (DirectMessageUserModel) result[2];
-				ViewHolder h = (ViewHolder) v.getTag();
-				if (h.user == usr) {
-					h.avatar.setImageBitmap(img);
-				}
-			}
-		}
-	}
-	
 	public static class ViewHolder extends HeaderViewAdapter.ViewHolder {
 		public DirectMessageUserModel user;
 		public ImageView avatar;
@@ -158,18 +138,19 @@ public class DirectMessageUserAdapter extends HeaderViewAdapter<DirectMessageUse
 			super(v);
 			this.v = v;
 			this.user = user;
-			
+
 			avatar = Utility.findViewById(v, R.id.direct_message_avatar);
 			name = Utility.findViewById(v, R.id.direct_message_name);
 			text = Utility.findViewById(v, R.id.direct_message_text);
 			date = Utility.findViewById(v, R.id.direct_message_date);
-			
+
 			v.setTag(this);
 
 			Utility.bindOnClick(this, v, "show");
 			Utility.bindOnLongClick(this, v, "showUser");
 		}
 
+		@Binded
 		void show() {
 			Intent i = new Intent();
 			i.setAction(Intent.ACTION_MAIN);
@@ -178,6 +159,7 @@ public class DirectMessageUserAdapter extends HeaderViewAdapter<DirectMessageUse
 			v.getContext().startActivity(i);
 		}
 
+		@Binded
 		boolean showUser() {
 			Intent i = new Intent();
 			i.setAction(Intent.ACTION_MAIN);
@@ -186,6 +168,6 @@ public class DirectMessageUserAdapter extends HeaderViewAdapter<DirectMessageUse
 			v.getContext().startActivity(i);
 			return true;
 		}
-		
+
 	}
 }

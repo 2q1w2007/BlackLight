@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-* Copyright (C) 2014 Peter Cai
+* Copyright (C) 2015 Peter Cai
 *
 * This file is part of BlackLight
 *
@@ -21,6 +21,12 @@
 
 	<string name="app_name">BlackLight</string>
 	
+	<!-- App Key -->
+	<string name="custom">自定义</string>
+	<string name="custom_des">App ID / Secret 被用于获取微博登录授权。如果其权限不足，本软件将无法正确运行。</string>
+	<string name="app_copy">复制</string>
+	<string name="app_hint">啥？？？</string>
+	
 	<!-- Login -->
 	<string name="login">登录</string>
 	<string name="tail">尾巴</string>
@@ -28,7 +34,7 @@
 	<string name="passwd">密码</string>
 	<string name="toast_empty_username">请输入用户名</string>
 	<string name="toast_empty_password">请输入密码</string>
-
+	
 	<!-- Main -->
 	<string name="switch_theme">切换主题</string>
 	<string name="group_all">全部</string>
@@ -36,6 +42,15 @@
 	<string name="group_create">创建分组</string>
 	<string name="group_destroy">删除当前分组</string>
 
+	<string-array name="main_tabs">
+		<item>首页</item>
+		<item>评论</item>
+		<item>提及的微博</item>
+		<item>提及的评论</item>
+		<item>私信</item>
+		<item>收藏</item>
+	</string-array>
+	
 	<!-- Left Drawer -->
 	<string name="drawer_home">首页</string>
 	<string name="drawer_at">提及</string>
@@ -43,6 +58,7 @@
 	<string name="drawer_dm">私信</string>
 	<string name="drawer_fav">收藏</string>
 	<string name="drawer_settings">设置</string>
+	<string name="add">添加</string>
 	
 	<!-- Statuses -->
 	<string name="timeline">时间流</string>
@@ -57,7 +73,7 @@
 	<string name="repost">转发微博</string>
 	<string name="reply_to">回复评论</string>
 	<string name="reply">回复</string>
-    <string name="remove_attitude">取消赞</string>
+	<string name="remove_attitude">取消赞</string>
 	<string name="repost_and_comment">同时评论微博</string>
 	<string name="repost_and_comment_the_original">同时评论原微博</string>
 	<string name="comment_and_repost">同时转发微博</string>
@@ -138,6 +154,7 @@
 	<string name="save">保存到手机</string>
 	
 	<!-- Settings -->
+	<string name="enough">对不起，但是我们已经受够你了。您将不再被欢迎使用BlackLight。现在BlackLight将立即崩溃。</string>
 	<string name="settings">设置</string>
 	<string name="about">关于</string>
 	<string name="version">版本</string>
@@ -168,10 +185,11 @@
 	<string name="set_interval">设置提醒间隔</string>
 	<string name="good">给个好评</string>
 	<string name="good_sum">亲，去Play商店给个好评呗</string>
-	<string name="play_url">https://play.google.com/store/apps/details?id=us.shandian.blacklight</string>
 	<string name="network">网络</string>
 	<string name="auto_nopic">智能无图</string>
-	<string name="auto_nopic_sum">流量环境下不显示图片，WIFI环境下显示图片</string>
+	<string name="auto_nopic_sum">流量环境下不显示图片，WiFi环境下显示图片</string>
+	<string name="keyword">关键字过滤</string>
+	<string name="keyword_sum">多个关键词请用\", \"(一个英文逗号和一个空格)隔开。正则表达式须用\"`\"包裹。</string>
 	<string-array name="interval_name">
 		<item>1 分钟</item>
 		<item>3 分钟</item>
@@ -220,5 +238,14 @@
 	<string name="clear_cache">清空缓存</string>
 	<string name="clear_cache_hint">系统设置 -> 应用程序 -> BlackLight</string>
 	<string name="feedback_sum">告诉我们关于你对这个应用的建议</string>
+	<string name="post_photo">分享图片</string>
 
+	<string-array name="click_refusal">
+		<item>嘿，你好啊</item>
+		<item>不，我们并没有做彩蛋</item>
+		<item>都说了没有你还点？</item>
+		<item>再点要坏了！</item>
+		<item>好吧好吧你赢了。</item>
+	</string-array>
+	
 </resources>

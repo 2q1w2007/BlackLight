@@ -12,6 +12,10 @@ before_install:
 - wget https://dl-ssl.google.com/android/repository/build-tools_r21.0.2-linux.zip
 - unzip build-tools_r21.0.2-linux.zip -d $ANDROID_HOME >> /dev/null
 - mv $ANDROID_HOME/android-5.0 $ANDROID_HOME/build-tools/21.0.2
+- wget https://dl-ssl.google.com/android/repository/android_m2repository_r15.zip
+- unzip android_m2repository_r15.zip >> /dev/null
+- rm -rf $ANDROID_HOME/extras/google/m2repository
+- mv m2repository $ANDROID_HOME/extras/google/
 script: gradle :app-snapshot:build
 after_success:
 - git config --global user.email "xqsx43cxy@126.com"
@@ -20,8 +24,8 @@ after_success:
 - git tag $GIT_TAG
 - git push --quiet https://$GITHUBKEY@github.com/PaperAirplane-Dev-Team/BlackLight.git $GIT_TAG
 android:
-  componenents:
-  - build-tools-21.0.2
+  components:
+  - build-tools-21.1.2
   - android-21
   - extra-android-support
   - extra-android-m2repository

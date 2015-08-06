@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Peter Cai
+ * Copyright (C) 2015 Peter Cai
  *
  * This file is part of BlackLight
  *
@@ -33,6 +33,7 @@ public class Settings
 	public static final String FAST_SCROLL = "fast_scroll";
 	public static final String SHAKE_TO_RETURN = "shake_to_return";
 	public static final String RIGHT_HANDED = "right_handed";
+	public static final String KEYWORD = "keyword";
 
 	// Notification
 	public static final String NOTIFICATION_SOUND = "notification_sound",
@@ -52,6 +53,9 @@ public class Settings
 
 	// Group
 	public static final String CURRENT_GROUP = "current_group";
+	
+	// Position
+	public static final String LAST_POSITION = "last_position";
 	
 	private static Settings sInstance;
 	

@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2014 Peter Cai
+/*
+ * Copyright (C) 2015 Peter Cai
  *
  * This file is part of BlackLight
  *
@@ -20,38 +20,54 @@
 package info.papdt.blacklight.support.adapter;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.CheckBox;
 import android.widget.ImageView;
 
-import java.lang.ref.WeakReference;
+import com.squareup.picasso.Picasso;
+
+import java.io.File;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 import info.papdt.blacklight.R;
 import info.papdt.blacklight.model.GalleryModel;
-import info.papdt.blacklight.support.AsyncTask;
 import info.papdt.blacklight.support.Utility;
 import static info.papdt.blacklight.BuildConfig.DEBUG;
 
 public class GalleryAdapter extends BaseAdapter implements AdapterView.OnItemClickListener {
 	private static final String TAG = GalleryAdapter.class.getSimpleName();
 
-	private ArrayList<GalleryModel> mList = new ArrayList<GalleryModel>();
-	private HashMap<String,  WeakReference<Bitmap>> mBitmaps = new HashMap<String, WeakReference<Bitmap>>();
+	private ArrayList<GalleryModel> mList = new ArrayList<>();
+	private ArrayList<GalleryModel> mChecked = new ArrayList<>();
 
 	private LayoutInflater mInflater;
+	private boolean mScrolling = false;
 
-	public GalleryAdapter(Context context, ArrayList<GalleryModel> list) {
+	public GalleryAdapter(Context context, ArrayList<GalleryModel> list, AbsListView listView) {
 		mInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		mList = list;
+
+		listView.setOnScrollListener(new AbsListView.OnScrollListener() {
+			@Override
+			public void onScrollStateChanged(AbsListView v, int state) {
+				mScrolling = (state != AbsListView.OnScrollListener.SCROLL_STATE_IDLE);
+			}
+
+			@Override
+			public void onScroll(AbsListView p1, int p2, int p3, int p4) {
+			        // Nothing to do
+			}
+		});
 	}
 
 	@Override
@@ -87,21 +103,19 @@ public class GalleryAdapter extends BaseAdapter implements AdapterView.OnItemCli
 			GalleryModel gallery = mList.get(position);
 
 			h.path = gallery.path;
+			h.id = gallery.id;
 
-			WeakReference<Bitmap> w = mBitmaps.get(gallery.path);
-			Bitmap bmp = w != null ? w.get() : null;
-			
-			if (bmp == null) {
-				h.img.setImageBitmap(null);
-				new LoadTask().execute(h, gallery.path);
-			} else {
-				h.img.setImageBitmap(bmp);
-			}
-			
+			Picasso.with(v.getContext())
+			.load(new File(gallery.path))
+			.fit()
+			.centerCrop()
+			.into(h.img);
+
 			if (gallery.checked) {
-				h.check.setChecked(true);
 				h.check.setVisibility(View.VISIBLE);
+				h.check.setChecked(true);
 			} else {
+				h.check.setChecked(false);
 				h.check.setVisibility(View.GONE);
 			}
 
@@ -116,10 +130,13 @@ public class GalleryAdapter extends BaseAdapter implements AdapterView.OnItemCli
 		m.checked = !m.checked;
 
 		if (m.checked) {
-			h.check.setChecked(true);
 			h.check.setVisibility(View.VISIBLE);
+			h.check.setChecked(true);
+			mChecked.add(m);
 		} else {
+			h.check.setChecked(false);
 			h.check.setVisibility(View.GONE);
+			mChecked.remove(m);
 		}
 
 		if (DEBUG) {
@@ -129,14 +146,27 @@ public class GalleryAdapter extends BaseAdapter implements AdapterView.OnItemCli
 
 	public ArrayList<String> getChecked() {
 		ArrayList<String> ret = new ArrayList<String>();
-		
-		for (GalleryModel m : mList) {
-			if (m.checked) {
-				ret.add(m.path);
-			}
+
+		for (GalleryModel m : mChecked) {
+			ret.add(m.path);
 		}
 
 		return ret;
+	}
+
+	private boolean waitUntilNotScrolling(ViewHolder h, String path) {
+		while (mScrolling) {
+			if (!h.path.equals(path))
+				return false;
+
+			try {
+				Thread.sleep(200);
+			} catch (Exception e) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	class ViewHolder {
@@ -145,38 +175,12 @@ public class GalleryAdapter extends BaseAdapter implements AdapterView.OnItemCli
 		public ImageView img;
 		public CheckBox check;
 		public String path;
+		public long id = -1;
 
 		public ViewHolder(View v) {
 			this.v = v;
 			img = Utility.findViewById(v, R.id.img_picker_img);
 			check = Utility.findViewById(v, R.id.img_picker_check);
-		}
-	}
-
-	class LoadTask extends AsyncTask<Object, Void, Bitmap> {
-		String path = "";
-		ViewHolder h = null;
-
-		@Override
-		protected Bitmap doInBackground(Object... params) {
-			h = (ViewHolder) params[0];
-			path = (String) params[1];
-
-			// Load
-			BitmapFactory.Options op = new BitmapFactory.Options();
-			op.inJustDecodeBounds = true;
-			BitmapFactory.decodeFile(path, op);
-			op.inJustDecodeBounds = false;
-			op.inSampleSize = Utility.computeSampleSize(op, -1, 160 * 160);
-			return BitmapFactory.decodeFile(path, op);
-		}
-
-		@Override
-		protected void onPostExecute(Bitmap result) {
-			if (path.equals(h.path)) {
-				h.img.setImageBitmap(result);
-				mBitmaps.put(path, new WeakReference<Bitmap>(result));
-			}
 		}
 	}
 }

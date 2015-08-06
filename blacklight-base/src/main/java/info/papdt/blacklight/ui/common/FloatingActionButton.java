@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2014 Peter Cai
+/*
+ * Copyright (C) 2015 Peter Cai
  *
  * This file is part of BlackLight
  *
@@ -24,16 +24,22 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.app.Activity;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Outline;
 import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.RippleDrawable;
+import android.os.Build;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewOutlineProvider;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.OvershootInterpolator;
 import android.widget.FrameLayout;
@@ -42,52 +48,83 @@ import android.widget.FrameLayout;
  * From GitHub Gist: https://gist.github.com/Jogan/9def6110edf3247825c9
  */
 public class FloatingActionButton extends View implements Animator.AnimatorListener {
- 
+
 	final static OvershootInterpolator overshootInterpolator = new OvershootInterpolator();
 	final static AccelerateInterpolator accelerateInterpolator = new AccelerateInterpolator();
- 
+
 	Context context;
 	Paint mButtonPaint;
 	Paint mDrawablePaint;
 	Bitmap mBitmap;
+	Drawable mRipple;
 	boolean mHidden = false;
- 
+
 	public FloatingActionButton(Context context) {
 		super(context);
 		this.context = context;
 		init(Color.WHITE);
 	}
- 
+
 	public void setFloatingActionButtonColor(int FloatingActionButtonColor) {
 		init(FloatingActionButtonColor);
 	}
- 
+
 	public void setFloatingActionButtonDrawable(Drawable FloatingActionButtonDrawable) {
 		mBitmap = ((BitmapDrawable) FloatingActionButtonDrawable).getBitmap();
 		invalidate();
 	}
- 
+
 	public void init(int FloatingActionButtonColor) {
 		setWillNotDraw(false);
-		setLayerType(View.LAYER_TYPE_SOFTWARE, null);
- 
-		mButtonPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-		mButtonPaint.setColor(FloatingActionButtonColor);
-		mButtonPaint.setStyle(Paint.Style.FILL);
-		mButtonPaint.setShadowLayer(10.0f, 0.0f, 3.5f, Color.argb(100, 0, 0, 0));
+		setClickable(true);
+
 		mDrawablePaint = new Paint(Paint.ANTI_ALIAS_FLAG);
- 
+
+		if (Build.VERSION.SDK_INT >= 21) {
+			setLayerType(View.LAYER_TYPE_HARDWARE, null);
+
+			mRipple = new RippleDrawable(new ColorStateList(new int[][]{
+				{}
+			}, new int[]{
+				Color.WHITE
+			}), new ColorDrawable(FloatingActionButtonColor), null);
+			setBackgroundDrawable(mRipple);
+			setOutlineProvider(new ViewOutlineProvider() {
+				@Override
+				public void getOutline(View view, Outline outline) {
+					outline.setOval(getPaddingLeft(), getPaddingTop(), getPaddingLeft() + getRealWidth(), getPaddingTop() + getRealHeight());
+				}
+			});
+			setClipToOutline(true);
+			setElevation(19.6f);
+		} else {
+			setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+
+			mButtonPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+			mButtonPaint.setColor(FloatingActionButtonColor);
+			mButtonPaint.setStyle(Paint.Style.FILL);
+			mButtonPaint.setShadowLayer(10.0f, 0.0f, 3.5f, Color.argb(100, 0, 0, 0));
+		}
+
 		invalidate();
 	}
- 
+
 	@Override
 	protected void onDraw(Canvas canvas) {
-		setClickable(true);
-		canvas.drawCircle(getPaddingLeft() + getRealWidth() / 2,
+		super.onDraw(canvas);
+
+		if (mRipple != null) {
+			mRipple.setBounds(0, 0, getWidth(), getHeight());
+			mRipple.draw(canvas);
+		} else {
+			canvas.drawCircle(getPaddingLeft() + getRealWidth() / 2,
 				getPaddingTop() + getRealHeight() / 2,
 				(float) getRealWidth() / 2.6f, mButtonPaint);
+		}
+
 		canvas.drawBitmap(mBitmap, getPaddingLeft() + (getRealWidth() - mBitmap.getWidth()) / 2,
 				getPaddingTop() + (getRealHeight() - mBitmap.getHeight()) / 2, mDrawablePaint);
+
 	}
 
 	private int getRealWidth() {
@@ -97,15 +134,18 @@ public class FloatingActionButton extends View implements Animator.AnimatorListe
 	private int getRealHeight() {
 		return getHeight() - getPaddingTop() - getPaddingBottom();
 	}
- 
+
 	@Override
 	public boolean onTouchEvent(MotionEvent event) {
-		if (event.getAction() == MotionEvent.ACTION_UP) {
-			setAlpha(1.0f);
-		} else if (event.getAction() == MotionEvent.ACTION_DOWN) {
-			setAlpha(0.6f);
+		boolean ret = super.onTouchEvent(event);
+		if (mRipple == null) {
+			if (event.getAction() == MotionEvent.ACTION_UP) {
+				setAlpha(1.0f);
+			} else if (event.getAction() == MotionEvent.ACTION_DOWN) {
+				setAlpha(0.6f);
+			}
 		}
-		return super.onTouchEvent(event);
+		return ret;
 	}
 
 	@Override
@@ -130,7 +170,7 @@ public class FloatingActionButton extends View implements Animator.AnimatorListe
 
 	}
 
- 
+
 	public void hideFloatingActionButton() {
 		if (!mHidden) {
 			ObjectAnimator scaleX = ObjectAnimator.ofFloat(this, "scaleX", 1, 0);
@@ -144,7 +184,7 @@ public class FloatingActionButton extends View implements Animator.AnimatorListe
 			mHidden = true;
 		}
 	}
- 
+
 	public void showFloatingActionButton() {
 		if (mHidden) {
 			setVisibility(View.VISIBLE);
@@ -158,11 +198,11 @@ public class FloatingActionButton extends View implements Animator.AnimatorListe
 			mHidden = false;
 		}
 	}
- 
+
 	public boolean isHidden() {
 		return mHidden;
 	}
- 
+
 	static public class Builder {
 		private FrameLayout.LayoutParams params;
 		private final Activity activity;
@@ -175,16 +215,16 @@ public class FloatingActionButton extends View implements Animator.AnimatorListe
 			paddingTop = 0,
 			paddingBottom = 0,
 			paddingRight = 0;
- 
+
 		public Builder(Activity context) {
 			scale = context.getResources().getDisplayMetrics().density;
 			size = convertToPixels(72, scale); // default size is 72dp by 72dp
 			params = new FrameLayout.LayoutParams(size, size);
 			params.gravity = gravity;
- 
+
 			this.activity = context;
 		}
- 
+
 		/**
 		 * Sets the gravity for the FAB
 		 */
@@ -192,7 +232,7 @@ public class FloatingActionButton extends View implements Animator.AnimatorListe
 			this.gravity = gravity;
 			return this;
 		}
- 
+
 		/**
 		 * Sets the margins for the FAB in dp
 		 */
@@ -203,7 +243,7 @@ public class FloatingActionButton extends View implements Animator.AnimatorListe
 			paddingBottom = convertToPixels(bottom, scale);
 			return this;
 		}
- 
+
 		/**
 		 * Sets the FAB drawable
 		 */
@@ -211,7 +251,7 @@ public class FloatingActionButton extends View implements Animator.AnimatorListe
 			this.drawable = drawable;
 			return this;
 		}
- 
+
 		/**
 		 * Sets the FAB color
 		 */
@@ -219,7 +259,7 @@ public class FloatingActionButton extends View implements Animator.AnimatorListe
 			this.color = color;
 			return this;
 		}
- 
+
 		/**
 		 * Sets the FAB size in dp
 		 */
@@ -228,7 +268,7 @@ public class FloatingActionButton extends View implements Animator.AnimatorListe
 			params = new FrameLayout.LayoutParams(size, size);
 			return this;
 		}
- 
+
 		public FloatingActionButton create() {
 			final FloatingActionButton button = new FloatingActionButton(activity);
 			button.setFloatingActionButtonColor(this.color);
@@ -239,7 +279,7 @@ public class FloatingActionButton extends View implements Animator.AnimatorListe
 			root.addView(button, params);
 			return button;
 		}
- 
+
 		// The calculation (value * scale + 0.5f) is a widely used to convert to dps to pixel units
 		// based on density scale
 		// see developer.android.com (Supporting Multiple Screen Sizes)

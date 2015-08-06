@@ -1,5 +1,5 @@
-/* 
- * Copyright (C) 2014 Peter Cai
+/*
+ * Copyright (C) 2015 Peter Cai
  *
  * This file is part of BlackLight
  *
@@ -29,6 +29,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.GridView;
 
+import java.io.File;
 import java.util.ArrayList;
 
 import info.papdt.blacklight.R;
@@ -81,11 +82,6 @@ public class MultiPicturePicker extends AbsActivity {
 		}
 	}
 
-	@Override
-	protected View getSwipeView() {
-		return findViewById(R.id.picker_grid);
-	}
-
 	private void buildAdapter() {
 		ArrayList<GalleryModel> model = new ArrayList<GalleryModel>();
 
@@ -101,6 +97,7 @@ public class MultiPicturePicker extends AbsActivity {
 				while (cursor.moveToNext()) {
 					GalleryModel m = new GalleryModel();
 					m.path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+					m.id = cursor.getLong(cursor.getColumnIndex(MediaStore.Images.Media._ID));
 
 					if (DEBUG) {
 						Log.d(TAG, "m.path = " + m.path);
@@ -112,6 +109,6 @@ public class MultiPicturePicker extends AbsActivity {
 		} catch (Exception e) {
 		}
 
-		mAdapter = new GalleryAdapter(this, model);
+		mAdapter = new GalleryAdapter(this, model, mGrid);
 	}
 }

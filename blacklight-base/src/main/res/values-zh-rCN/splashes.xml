@@ -19,6 +19,18 @@
 -->
 <resources>
 	<!-- Funny Things -->
+	<string-array name="title_splashes">
+		<item>黑灯</item>
+		<item>瞎火</item>
+		<item>黑光</item>
+		<item>紫外</item>
+		<item>BlackLight</item>
+		<item>BL</item>
+		<item>黑魔法</item>
+		<item>失去人性，失去很多</item>
+		<item>失去兽性，失去一切</item>
+	</string-array>
+
 	<string-array name="splashes">
 		<item>Stay hungry, stay foolish.</item>
 		<item>BlackLight 官方中文译名暂定为 ”黑灯“</item>
@@ -59,6 +71,7 @@
 		<item>690战术核显卡</item>
 		<item>1970年01月01日08:00 GMT +0800</item>
 		<item>是上清华还是上北大呢？ [思考]</item>
+		<item>是上北大清华还是上北大青鸟呢？ [思考]</item>
 		<item>com.sun.java.swing.plaf.nimbus.InternalFrameInternalFrameTitlePane</item>
 		<item>com.sun.java.swing.plaf.nimbus.InternalFrameTitlePaneMaximizeButtonWindowNotFocusedState</item>
 		<item>不转不是中国人!!</item>
@@ -94,6 +107,7 @@
 		<item>Talk is cheap. Show me the code.</item>
 		<item>Oh my God! They killed Kenny!</item>
 		<item>25198 lines of code!</item>
+		<item>25198行代码，一半是import</item>
 		<item>+ 65535!</item>
 		<item>if (Math.random() > 0.8){ // Make this a matter of possibility.</item>
 		<item>You\'ve become part of a bigger universe.</item>
@@ -162,5 +176,42 @@
 		<item>普通外科医生</item>
 		<item>全球最大的同性交友网站：bilibili</item>
 		<item>Python 的多线程特别棒！</item>
+		<item>性别不同，怎么谈恋爱？</item>
+		<item>CUP占用率100%</item>
+		<item>你拉低了整条街的智商</item>
+		<item>too young too native</item>
+		<item>本来就是弯的，别委屈他装直了</item>
+		<item>AOSC----Always Overuse Shell Community</item>
+		<item>干嘛呵呵去洗澡</item>
+		<item>在吗忙不早点睡</item>
+		<item>together = to get her</item>
+		<item>没对象?自己new一个</item>
+		<item>面向对象的编程</item>
+		<item>I think love is a touch and yet not a touch</item>
+		<item>我有超能力！只要我约妹子妹子就会有事！</item>
+		<item>我们是纯洁的超友谊关系</item>
+		<item>中国有点硬，所以我使用翻译</item>
+		<item>本来就是弯的，别委屈他装直了</item>
+		<item>┋◆冃.狌.交.伖，释.鲂.压.劦、棑.解.漃.瘼◆ 真 人】视||频. █网.址：wWw. GitHub .Com◆┋</item>
+		<item>四大自虐：拿HTML5写APP、为IE6做兼容、在朋友圈做营销、给微博写第三方客户端。——bgm38</item>
+		<item>With great power comes great responsibility</item>
+		<item>失去人性，失去很多；失去兽性，失去一切。</item>
+		<item>现在的80后太拼了，可是身体健康也很重要，据数据统计，现今为止没有一个80后寿命超过40岁，这一社会现象值得我们所有人反思！</item>
+		<item>不服跑个分</item>
+		<item>奇变偶不变，符号看象限</item>
+		<item>我不哭，我坚强，今夜你们都是我</item>
+		<item>姚文元很坏 沛公没文化 然而没乱用 盛世前程顺</item>
+		<item>CS Go 就是用 CoffeeScript 写的 Go</item>
+		<item>宇宙中心五道口</item>
+		<item>闷声大发财</item>
+		<item>闷声发大财</item>
+		<item>拉话话容易拉手手难</item>
+		<item>知识就是力量，法国就是培根</item>
+		<item>请坐和放宽</item>
+		<item>Something happened.</item>
+		<item>我们都有不顺利的适合</item>
+		<item>中国或成最大输家</item>
+		<item>人在做，天在看；秀恩爱，分得快——FFF 纸飞机团支部 宣</item>
+		<item>天灭异性恋，归团保平安 ——FFF 纸飞机团支部 宣</item>
 	</string-array>
 </resources>

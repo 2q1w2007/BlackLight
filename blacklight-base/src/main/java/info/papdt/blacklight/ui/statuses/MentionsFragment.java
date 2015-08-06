@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Peter Cai
+ * Copyright (C) 2015 Peter Cai
  *
  * This file is part of BlackLight
  *
@@ -20,6 +20,7 @@
 package info.papdt.blacklight.ui.statuses;
 
 import android.app.Fragment;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.v13.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
@@ -30,7 +31,8 @@ import android.view.ViewGroup;
 
 import info.papdt.blacklight.R;
 import info.papdt.blacklight.ui.comments.CommentMentionsTimeLineFragment;
-import info.papdt.blacklight.ui.common.LinearViewPagerIndicator;
+import info.papdt.blacklight.ui.common.SlidingTabLayout;
+import info.papdt.blacklight.ui.common.SlidingTabStrip.SimpleTabColorizer;
 import info.papdt.blacklight.ui.main.MainActivity;
 import info.papdt.blacklight.support.Utility;
 
@@ -38,7 +40,7 @@ import info.papdt.blacklight.support.Utility;
  * This class combines MentionsTimeLine and CommentMentionsTimeLine together
  * */
 public class MentionsFragment extends Fragment implements SwipeRefreshLayout.OnRefreshListener, MainActivity.Refresher {
-	private LinearViewPagerIndicator mIndicator;
+	private SlidingTabLayout mIndicator;
 	private ViewPager mPager;
 
 	private MentionsTimeLineFragment mRetweet;
@@ -51,13 +53,25 @@ public class MentionsFragment extends Fragment implements SwipeRefreshLayout.OnR
 		// Initialize views
 		mIndicator = Utility.findViewById(v, R.id.mentions_indicator);
 		mPager = Utility.findViewById(v, R.id.mentions_pager);
-
+		
 		// Initialize indicator
-		mIndicator.setViewPager(mPager);
-		mIndicator.addTab(getString(R.string.retweet));
-		mIndicator.addTab(getString(R.string.comment));
-		mIndicator.setForeground(getResources().getColor(R.color.white));
-
+		mIndicator.setCustomTabColorizer(new SimpleTabColorizer() {
+			@Override
+			public int getIndicatorColor(int position) {
+				return getResources().getColor(R.color.white);
+			}
+			
+			@Override
+			public int getSelectedTitleColor(int position) {
+				return getResources().getColor(R.color.white);
+			}
+		});
+		mIndicator.setDistributeEvenly(true);
+		
+		if (Build.VERSION.SDK_INT >= 21) {
+			mIndicator.setElevation(((MainActivity) getActivity()).getToolbarElevation());
+		}
+		
 		// View Pager
 		mRetweet = new MentionsTimeLineFragment();
 		mComment = new CommentMentionsTimeLineFragment();
@@ -79,7 +93,21 @@ public class MentionsFragment extends Fragment implements SwipeRefreshLayout.OnR
 						return null;
 				}
 			}
+			
+			@Override
+			public CharSequence getPageTitle(int position) {
+				switch (position) {
+					case 0:
+						return getString(R.string.retweet);
+					case 1:
+						return getString(R.string.comment);
+					default:
+						return "";
+				}
+			}
 		});
+		
+		mIndicator.setViewPager(mPager);
 
 		return v;
 	}
@@ -91,6 +119,16 @@ public class MentionsFragment extends Fragment implements SwipeRefreshLayout.OnR
 		if (!hidden) {
 			((MainActivity) getActivity()).getToolbar().setTranslationY(0);
 			((MainActivity) getActivity()).getSupportActionBar().setTitle(getString(R.string.drawer_at));
+			mIndicator.notifyIndicatorColorChanged();
+			
+			if (Build.VERSION.SDK_INT >= 21) {
+				((MainActivity) getActivity()).getToolbar().setElevation(0f);
+			}
+		} else if (Build.VERSION.SDK_INT >= 21) {
+			MainActivity activity = (MainActivity) getActivity();
+			
+			if (activity != null && activity.getToolbar() != null)
+				activity.getToolbar().setElevation(activity.getToolbarElevation());
 		}
 	}
 

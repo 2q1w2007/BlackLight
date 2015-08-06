@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2014 Peter Cai
  *
  * This file is part of BlackLight
@@ -19,7 +19,7 @@
 
 package info.papdt.blacklight.ui.statuses;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -50,6 +50,7 @@ import info.papdt.blacklight.model.GroupModel;
 import info.papdt.blacklight.model.UserModel;
 import info.papdt.blacklight.support.AsyncTask;
 import info.papdt.blacklight.support.Utility;
+import info.papdt.blacklight.support.Binded;
 import info.papdt.blacklight.ui.common.AbsActivity;
 import info.papdt.blacklight.ui.common.GenerousSlidingUpPanelLayout;
 import info.papdt.blacklight.ui.directmessage.DirectMessageConversationActivity;
@@ -59,7 +60,7 @@ public class UserTimeLineActivity extends AbsActivity
 {
 	private UserTimeLineFragment mFragment;
 	private UserModel mModel;
-	
+
 	private TextView mFollowState;
 	private ImageView mFollowImg;
 	private TextView mDes;
@@ -70,25 +71,29 @@ public class UserTimeLineActivity extends AbsActivity
 	private ImageView mAvatar;
 	private ImageView mCover;
 	private View mFollowingContainer;
-    private View mFollowersContainer;
+	private View mFollowersContainer;
 	private LinearLayout mLayoutFollowState;
 	private GenerousSlidingUpPanelLayout mSlide;
-	
+
 	private MenuItem mMenuFollow;
 	private MenuItem mMenuGroup;
-	
+
 	private UserApiCache mCache;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+		// Arguments
+		mModel = getIntent().getParcelableExtra("user");
+
+		if (!Utility.isDarkMode(this) && mModel.isMale() != UserApiCache.amIMale()) {
+			setTheme(R.style.BL_Theme_Purple);
+		}
+
 		mLayout = R.layout.user_timeline_activity;
-        super.onCreate(savedInstanceState);
+		super.onCreate(savedInstanceState);
 
 		mCache = new UserApiCache(this);
 
-		// Arguments
-		mModel = getIntent().getParcelableExtra("user");
-		
 		// Initialize views
 		mFollowState = Utility.findViewById(this, R.id.user_follow_state);
 		mFollowImg = Utility.findViewById(this, R.id.user_follow_img);
@@ -100,27 +105,27 @@ public class UserTimeLineActivity extends AbsActivity
 		mAvatar = Utility.findViewById(this, R.id.user_avatar);
 		mCover = Utility.findViewById(this, R.id.user_cover);
 		mFollowingContainer = Utility.findViewById(this, R.id.user_following_container);
-        mFollowersContainer = Utility.findViewById(this, R.id.user_followers_container);
+		mFollowersContainer = Utility.findViewById(this, R.id.user_followers_container);
 		mLayoutFollowState = Utility.findViewById(this, R.id.user_follow);
 		mSlide = Utility.findViewById(this, R.id.user_slide);
-		
+
 		View info = Utility.findViewById(this, R.id.user_info_button);
 		View dim = Utility.findViewById(this, R.id.user_dim);
-		
+
 		// Bind onClick events
 		Utility.bindOnClick(this, mLayoutFollowState, "follow");
 		Utility.bindOnClick(this, mFollowingContainer, "viewFriends");
-        Utility.bindOnClick(this, mFollowersContainer, "viewFollowers");
+		Utility.bindOnClick(this, mFollowersContainer, "viewFollowers");
 		Utility.bindOnClick(this, info, dim, "showOrHideInfo");
-		
+
 		getSupportActionBar().setTitle(mModel.name);
-	
+
 		// Follower state (following/followed/each other)
 		resetFollowState();
 		if (mModel != null && mModel.id.equals((new UserApiCache(this).getUser( (new LoginApiCache(this).getUid()) ).id))) {
 			mLayoutFollowState.setVisibility(View.GONE);
 		}
-		
+
 		// Also view values
 		mDes.setText(mModel.description);
 		mFollowers.setText(Utility.addUnitToInt(this, mModel.followers_count));
@@ -133,9 +138,9 @@ public class UserTimeLineActivity extends AbsActivity
 		mFollowing.setTypeface(mTypeface);
 		mMsgs.setTypeface(mTypeface);
 		mFollowState.setTypeface(mTypeface);
-		
+
 		new Downloader().execute();
-		
+
 		mFragment = new UserTimeLineFragment(mModel.id);
 		getFragmentManager().beginTransaction().replace(R.id.user_timeline_container, mFragment).commit();
 
@@ -169,7 +174,7 @@ public class UserTimeLineActivity extends AbsActivity
 		}
 		return true;
 	}
-	
+
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		int id = item.getItemId();
@@ -194,37 +199,36 @@ public class UserTimeLineActivity extends AbsActivity
 		}
 	}
 
-	@Override
-	protected View getSwipeView() {
-		return findViewById(R.id.user_slide);
+	@Binded
+	public void viewFriends() {
+		Intent i = new Intent();
+		i.setAction(Intent.ACTION_VIEW);
+		i.putExtra("uid", mModel.id);
+		i.putExtra("isFriends", true);
+		i.setClass(this, FriendsActivity.class);
+		startActivity(i);
+	}
+	@Binded
+	public void viewFollowers() {
+		Intent i = new Intent();
+		i.setAction(Intent.ACTION_VIEW);
+		i.putExtra("uid", mModel.id);
+		i.putExtra("isFriends", false);
+		i.setClass(this, FriendsActivity.class);
+		startActivity(i);
 	}
 
-	public void viewFriends() {
-    Intent i = new Intent();
-    i.setAction(Intent.ACTION_VIEW);
-    i.putExtra("uid", mModel.id);
-    i.putExtra("isFriends", true);
-    i.setClass(this, FriendsActivity.class);
-    startActivity(i);
-}
-    public void viewFollowers() {
-        Intent i = new Intent();
-        i.setAction(Intent.ACTION_VIEW);
-        i.putExtra("uid", mModel.id);
-        i.putExtra("isFriends", false);
-        i.setClass(this, FriendsActivity.class);
-        startActivity(i);
-    }
-
+	@Binded
 	public void follow() {
 		new Follower().execute();
 	}
 
+	@Binded
 	public void showOrHideInfo() {
 		mDesScroll.clearAnimation();
 
 		AlphaAnimation anim = null;
-		
+
 		final int start = mDesScroll.getVisibility();
 
 		if (start == View.VISIBLE) {
@@ -263,10 +267,10 @@ public class UserTimeLineActivity extends AbsActivity
 		mDesScroll.setAnimation(anim);
 		anim.start();
 	}
-	
+
 	private void resetFollowState() {
 		if (mModel == null) return;
-		
+
 		if (mModel.follow_me && mModel.following) {
 			mFollowImg.setImageResource(R.drawable.ic_arrow);
 			mFollowState.setText(R.string.following_each_other);
@@ -280,7 +284,7 @@ public class UserTimeLineActivity extends AbsActivity
 			mFollowImg.setImageResource(R.drawable.ic_action_new);
 			mFollowState.setText(R.string.no_following);
 		}
-		
+
 		if (mMenuFollow != null) {
 			mMenuFollow.setIcon(mModel.following ? R.drawable.ic_action_important : R.drawable.ic_action_not_important);
 			mMenuFollow.setTitle(getString(mModel.following ? R.string.unfollow : R.string.follow));
@@ -303,7 +307,7 @@ public class UserTimeLineActivity extends AbsActivity
 		}
 
 		@Override
-		protected Void doInBackground(Void... params) {
+		protected Void doInBackground(Void ... params) {
 			GroupListModel groupList = GroupsApi.getGroups();
 			groups = new GroupModel[groupList.getSize()];
 			titles = new String[groupList.getSize()];
@@ -325,27 +329,27 @@ public class UserTimeLineActivity extends AbsActivity
 
 			// New dialog
 			new AlertDialog.Builder(UserTimeLineActivity.this)
-					.setTitle(getResources().getString(R.string.change_group))
-					.setMultiChoiceItems(titles, checked, new DialogInterface.OnMultiChoiceClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-							checked[which] = isChecked;
-						}
-					})
-					.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-							new GroupChanger().execute(groups, checked);
-						}
-					})
-					.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
-						@Override
-						public void onClick(DialogInterface dialog, int which) {
-							dialog.dismiss();
-						}
-					})
-					.show();
+			.setTitle(getResources().getString(R.string.change_group))
+			.setMultiChoiceItems(titles, checked, new DialogInterface.OnMultiChoiceClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+					checked[which] = isChecked;
+				}
+			})
+			.setPositiveButton(android.R.string.ok, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+					new GroupChanger().execute(groups, checked);
+				}
+			})
+			.setNegativeButton(android.R.string.cancel, new DialogInterface.OnClickListener() {
+				@Override
+				public void onClick(DialogInterface dialog, int which) {
+					dialog.dismiss();
+				}
+			})
+			.show();
 		}
 	}
 
@@ -361,10 +365,10 @@ public class UserTimeLineActivity extends AbsActivity
 		}
 
 		@Override
-		protected Void doInBackground(Object... params) {
+		protected Void doInBackground(Object ... params) {
 			GroupModel[] groups = (GroupModel[]) params[0];
 			boolean[] checked = (boolean[]) params[1];
-			
+
 			for (int i = 0; i < groups.length; i++) {
 				if (checked[i]) {
 					GroupsApi.addMemberToGroup(mModel.id, groups[i].idstr);
@@ -382,16 +386,16 @@ public class UserTimeLineActivity extends AbsActivity
 		}
 
 	}
-	
+
 	private class Follower extends AsyncTask<Void, Void, Void> {
 		@Override
-		protected Void doInBackground(Void... params) {
+		protected Void doInBackground(Void ... params) {
 			if (mModel.following) {
 				FriendsApi.unfollow(mModel.id);
 			} else {
 				FriendsApi.follow(mModel.id);
 			}
-			
+
 			mModel.following = !mModel.following;
 			return null;
 		}
@@ -399,52 +403,52 @@ public class UserTimeLineActivity extends AbsActivity
 		@Override
 		protected void onPostExecute(Void result) {
 			super.onPostExecute(result);
-			
+
 			resetFollowState();
 		}
 	}
-	
+
 	private class Downloader extends AsyncTask<Void, Object, Void> {
 
 		@Override
-		protected Void doInBackground(Void... params) {
+		protected Void doInBackground(Void ... params) {
 			// Avatar
 			Bitmap avatar = mCache.getLargeAvatar(mModel);
-			publishProgress(new Object[]{0, avatar});
+			publishProgress(new Object[] {0, avatar});
 
 			// Cover
 			if (!mModel.getCover().trim().equals("")) {
 				Bitmap cover = mCache.getCover(mModel);
 				if (cover != null) {
-					publishProgress(new Object[]{1, cover});
+					publishProgress(new Object[] {1, cover});
 				}
 			}
 
 			// Refresh state
 			mModel = mCache.getUser(mModel.id);
 			publishProgress(2);
-			
+
 			return null;
 		}
 
 		@Override
-		protected void onProgressUpdate(Object... values) {
+		protected void onProgressUpdate(Object ... values) {
 			super.onProgressUpdate(values);
-			
+
 			switch (Integer.parseInt(String.valueOf(values[0]))) {
-				case 0:
-					if (mAvatar != null) {
-						mAvatar.setImageBitmap((Bitmap) values[1]);
-					}
-					break;
-				case 1:
-					if (mCover != null) {
-						mCover.setImageBitmap((Bitmap) values[1]);
-					}
-					break;
-				case 2:
-					resetFollowState();
-					break;
+			case 0:
+				if (mAvatar != null) {
+					mAvatar.setImageBitmap((Bitmap) values[1]);
+				}
+				break;
+			case 1:
+				if (mCover != null) {
+					mCover.setImageBitmap((Bitmap) values[1]);
+				}
+				break;
+			case 2:
+				resetFollowState();
+				break;
 			}
 		}
 	}

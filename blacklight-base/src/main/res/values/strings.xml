@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-* Copyright (C) 2014 Peter Cai
+* Copyright (C) 2015 Peter Cai
 *
 * This file is part of BlackLight
 *
@@ -21,6 +21,18 @@
 
 	<string name="app_name">BlackLight</string>
 	
+	<!-- App Key -->
+	<string name="key_gist" translatable="false">https://gist.github.com/PeterCxy/3085799055f63c63c911</string>
+	<string name="custom">Custom</string>
+	<string name="custom_des">App ID / Secret are used to authorize into Weibo to get an access token to access data. If no permission is granted to the token, the app will fail to function correctly.</string>
+	<string name="app_id" translatable="false">App ID</string>
+	<string name="app_secret" translatable="false">App Secret</string>
+	<string name="redirect_uri" translatable="false">Redirect Uri</string>
+	<string name="scope" translatable="false">Scope</string>
+	<string name="app_pkg" translatable="false">Package name (Optional, maybe useless)</string>
+	<string name="app_copy">Copy</string>
+	<string name="app_hint">Whaaat?</string>
+	
 	<!-- Login -->
 	<string name="login">Login</string>
 	<string name="tail">Tail</string>
@@ -36,6 +48,15 @@
 	<string name="group_create">Create group</string>
 	<string name="group_destroy">Delete current group</string>
 	
+	<string-array name="main_tabs">
+		<item>Home</item>
+		<item>Comments</item>
+		<item>Mentioning Posts</item>
+		<item>Mentioning Comments</item>
+		<item>Direct Messages</item>
+		<item>Favorites</item>
+	</string-array>
+	
 	<!-- Left Drawer -->
 	<string name="drawer_home">Home</string>
 	<string name="drawer_at">Mentions</string>
@@ -43,6 +64,7 @@
 	<string name="drawer_dm">Direct Messages</string>
 	<string name="drawer_fav">Favorites</string>
 	<string name="drawer_settings">Settings</string>
+	<string name="add">Add</string>
 	
 	<!-- Statuses -->
 	<string name="timeline">Timeline</string>
@@ -155,8 +177,13 @@
 		<item>1719269605</item>
 		<item>2121014783</item>
 		<item>1948661843</item>
+		<item>5611860244</item>
 		<item>2984891190</item>
 		<item>1797272061</item>
+	</string-array>
+	
+	<string-array name="banned_users">
+		<item>2787524360</item>
 	</string-array>
 
 	<!-- Image -->
@@ -194,10 +221,12 @@
 	<string name="set_interval">Set notification interval</string>
 	<string name="good">Rate me</string>
 	<string name="good_sum">:-) You know I\'ll be really happy if you give me 5 stars.</string>
-	<string name="play_url">https://play.google.com/store/apps/details?id=us.shandian.blacklight</string>
+	<string name="play_url" translatable="false">https://play.google.com/store/apps/details?id=us.shandian.blacklight</string>
 	<string name="network">Network</string>
 	<string name="auto_nopic">Auto save traffic</string>
 	<string name="auto_nopic_sum">Load pictures only if WiFi is connected</string>
+	<string name="keyword">Keyword filtering</string>
+	<string name="keyword_sum">Multiple keywords should be split by \", \" (a comma and a space), Regular Expressions should be wrapped by \"`\".</string>
 	<string-array name="interval_name">
 		<item>1 minute</item>
 		<item>3 minutes</item>
@@ -234,6 +263,7 @@
 	<string name="fb_send">Send</string>
 	
 	<!-- Message -->
+	<string name="enough">Sorry, but we HAVE HAD ENOUGH Of YOU! BlackLight is going to crash IMMEDIATELY.</string>
 	<string name="plz_wait">Please wait……</string>
 	<string name="name_fetching">Fetching names……</string>
 	<string name="expires_in">The token will be invalid in %d days.</string>
@@ -255,5 +285,14 @@
 	<string name="copied">Contents copied to clipboard</string>
 	<string name="clear_cache">Clear Cache</string>
 	<string name="clear_cache_hint">See \'Settings -\> Apps -\> BlackLight\'</string>
+	<string name="post_photo">Share Photo</string>
+
+	<string-array name="click_refusal">
+		<item>Hey, nice to see you.</item>
+		<item>No, there is NOT an easter egg.</item>
+		<item>I said no!</item>
+		<item>I\'m gonna go mad, seriously.</item>
+		<item>Okay, you win.</item>
+	</string-array>
 
 </resources>

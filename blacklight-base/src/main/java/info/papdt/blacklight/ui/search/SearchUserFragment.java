@@ -1,5 +1,5 @@
 /* 
- * Copyright (C) 2014 Peter Cai
+ * Copyright (C) 2015 Peter Cai
  *
  * This file is part of BlackLight
  *
@@ -26,16 +26,12 @@ import info.papdt.blacklight.ui.friendships.FriendsFragment;
 
 import static info.papdt.blacklight.BuildConfig.DEBUG;
 
-public class SearchUserFragment extends FriendsFragment implements SearchFragment.Searcher
+public class SearchUserFragment extends FriendsFragment implements SearchActivity.Searcher
 {
 	private static final String TAG = SearchUserFragment.class.getSimpleName();
 	
 	private String mSearch;
 	private int mPage = 0;
-	
-	public SearchUserFragment() {
-		mNeedHeader = false;
-	}
 	
 	@Override
 	public void search(String q) {

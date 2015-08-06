@@ -19,12 +19,13 @@
 
 package info.papdt.blacklight.ui.settings;
 
-import android.app.AlertDialog;
+import android.support.v7.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.preference.CheckBoxPreference;
+import android.preference.EditTextPreference;
 import android.preference.Preference;
 import android.preference.PreferenceFragment;
 import android.view.MenuItem;
@@ -60,6 +61,10 @@ public class SettingsFragment extends PreferenceFragment implements
 	private static final String DONATION = "donation";
 
 	private Settings mSettings;
+	
+	// Life needs joy!
+	private int mClickCount = 0;
+	private String[] mRefusals;
 
 	// About
 	private Preference mPrefLicense;
@@ -87,6 +92,7 @@ public class SettingsFragment extends PreferenceFragment implements
 	private CheckBoxPreference mPrefFastScroll;
 	private CheckBoxPreference mPrefShakeToReturn;
 	private CheckBoxPreference mPrefRightHanded;
+	private EditTextPreference mPrefKeyword;
 
 	// Notification
 	private CheckBoxPreference mPrefNotificationSound,
@@ -101,7 +107,7 @@ public class SettingsFragment extends PreferenceFragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		addPreferencesFromResource(R.xml.settings);
-
+		mRefusals = getResources().getStringArray(R.array.click_refusal);
 		mSettings = Settings.getInstance(getActivity());
 
 		// Init
@@ -126,6 +132,7 @@ public class SettingsFragment extends PreferenceFragment implements
 		mPrefInterval = findPreference(Settings.NOTIFICATION_INTERVAL);
 		mPrefAutoNoPic = (CheckBoxPreference) findPreference(Settings.AUTO_NOPIC);
 		mPrefDonation = findPreference(DONATION);
+		mPrefKeyword = (EditTextPreference) findPreference(Settings.KEYWORD);
 		
 		// Data
 		String version = "Unknown";
@@ -155,6 +162,7 @@ public class SettingsFragment extends PreferenceFragment implements
 		mPrefLang.setSummary(
 				this.getResources().getStringArray(R.array.langs) [Utility.getCurrentLanguage(getActivity())]);
 		mPrefAutoNoPic.setChecked(mSettings.getBoolean(Settings.AUTO_NOPIC, true));
+		mPrefKeyword.setText(mSettings.getString(Settings.KEYWORD, ""));
 		
 		// Set
 		mPrefLicense.setOnPreferenceClickListener(this);
@@ -179,6 +187,8 @@ public class SettingsFragment extends PreferenceFragment implements
 		mPrefAutoNoPic.setOnPreferenceChangeListener(this);
 		mPrefLang.setOnPreferenceClickListener(this);
 		mPrefDonation.setOnPreferenceClickListener(this);
+		mPrefKeyword.setOnPreferenceChangeListener(this);
+		mPrefVersion.setOnPreferenceClickListener(this);
 	}
 
 	@Override
@@ -255,6 +265,8 @@ public class SettingsFragment extends PreferenceFragment implements
 			i.setClass(getActivity(), DonationActivity.class);
 			startActivity(i);
 			return true;
+		} else if (preference == mPrefVersion) {
+			boom();
 		}
 
 		return false;
@@ -294,6 +306,10 @@ public class SettingsFragment extends PreferenceFragment implements
 					Boolean.parseBoolean(newValue.toString()));
 			Toast.makeText(getActivity(), R.string.needs_restart, Toast.LENGTH_SHORT).show();
 			return true;
+		} else if (preference == mPrefKeyword) {
+			mSettings.putString(Settings.KEYWORD, String.valueOf(newValue));
+			Toast.makeText(getActivity(), R.string.needs_restart, Toast.LENGTH_SHORT).show();
+			return true;
 		}
 
 		return false;
@@ -308,6 +324,7 @@ public class SettingsFragment extends PreferenceFragment implements
 						@Override
 						public void onClick(DialogInterface dialog, int which) {
 							mSettings.putInt(Settings.LANGUAGE, which);
+							dialog.dismiss();
 							getActivity().recreate();
 						}
 					}
@@ -339,6 +356,30 @@ public class SettingsFragment extends PreferenceFragment implements
 					})
 			.show();
 		
+	}
+	
+	private Runnable clearClickCount = new Runnable() {
+		@Override
+		public void run() {
+			mClickCount = 0;
+		}
+	};
+	private void boom() {
+		getActivity().getWindow().getDecorView().removeCallbacks(clearClickCount);
+		if (mClickCount == 5) {
+			Toast.makeText(getActivity(), R.string.enough, Toast.LENGTH_SHORT).show();
+			getActivity().getWindow().getDecorView().postDelayed(new Runnable() {
+				@Override
+				public void run() {
+					throw new RuntimeException("Your Fault");
+				}
+			}, 3000);
+		} else {
+			Toast.makeText(getActivity(), mRefusals[mClickCount], Toast.LENGTH_SHORT).show();
+			getActivity().getWindow().getDecorView().postDelayed(clearClickCount, 3000);
+		}
+		
+		mClickCount++;
 	}
 	
 }
